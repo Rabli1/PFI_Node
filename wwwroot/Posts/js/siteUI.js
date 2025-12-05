@@ -556,7 +556,7 @@ function newPost() {
     return Post;
 }
 function renderPostForm(post = null) {
-    if (!AuthManager.isLoggedIn()) {
+    if (!AuthManager.canCreatePost()) {
         showLoginForm();
         return;
     }
