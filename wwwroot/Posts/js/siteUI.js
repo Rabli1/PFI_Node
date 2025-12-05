@@ -20,7 +20,6 @@ Init_UI();
 async function Init_UI() {
     AuthManager.onTimeout = handleSessionTimeout;
     AuthManager.load();
-    AuthManager.clear();
 
     postsPanel = new PageManager('postsScrollPanel', 'postsPanel', 'postSample', renderPosts);
     $('#createPost').on("click", async function () {
@@ -683,7 +682,7 @@ function showLoginForm() {
             <input class="form-control Email" name="Email" id="Email" placeholder="Courriel" required />
             <label for="Password" class="form-label">Mot de passe</label>
             <input class="form-control" type="password" name="Password" id="Password" placeholder="Mot de passe" required />
-            <div class="formButton">
+            <div class="formButton mt-4">
                 <button type="submit" class="btn btn-primary w-100">Connexion</button>
             </div>
             <div class="formButton">

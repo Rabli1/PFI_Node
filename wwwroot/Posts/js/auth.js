@@ -40,7 +40,7 @@ const AuthManager = {
         localStorage.removeItem("access_token");
         noTimeout();
     },
-    isLoggedIn() { return this.user != null; },
+    isLoggedIn() { return this.user !== null },
     isAdmin() { return this.user && this.user.Authorizations && this.user.Authorizations.readAccess >= 3 && this.user.Authorizations.writeAccess >= 3; },
     isSuper() { return this.user && this.user.Authorizations && this.user.Authorizations.readAccess >= 2 && this.user.Authorizations.writeAccess >= 2; },
     canCreatePost() { return this.isSuper() || this.isAdmin(); },
