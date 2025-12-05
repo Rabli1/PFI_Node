@@ -12,6 +12,7 @@ server.start();
 
 RouteRegister.add('POST', 'accounts', 'register');
 RouteRegister.add('GET', 'accounts', 'verify');
+RouteRegister.add('POST', 'accounts', 'login');
 RouteRegister.add('GET', 'accounts', 'logout');
 RouteRegister.add('PUT', 'accounts', 'modify');
 RouteRegister.add('GET', 'accounts', 'remove');
