@@ -2,6 +2,7 @@ import PostModel from '../models/post.js';
 import Repository from '../models/repository.js';
 import Controller from './Controller.js';
 import AccessControl from '../accessControl.js';
+import path from 'path';
 
 export default class PostsController extends Controller {
     constructor(HttpContext) {
@@ -65,7 +66,8 @@ export default class PostsController extends Controller {
             post.Likes.splice(likeIndex, 1);
         else
             post.Likes.push(userId);
-
+        let splitPath = post.Image.split('/');
+        post.Image = splitPath[splitPath.length - 1]
         const updated = this.repository.update(post.Id, post, false);
         if (this.repository.model.state.isValid)
             this.HttpContext.response.JSON(this.repository.get(updated.Id));

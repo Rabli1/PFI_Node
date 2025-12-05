@@ -268,6 +268,11 @@ function renderPost(post) {
                 <div class="postActions">
                     ${canEdit ? `<span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>` : ""}
                     ${canEdit ? `<span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>` : ""}
+                    <span class="likeArea" title="${likeTitle}">
+                        <span class="likeCmd ${likeDisabledClass}" postId="${post.Id}">
+                            <i class="${likeIconClass}"></i> <span class="likeCount">${post.LikesCount}</span>
+                        </span>
+                    </span>
                 </div>
             </div>
             <div class="postTitle"> ${post.Title} </div>
@@ -278,11 +283,6 @@ function renderPost(post) {
             </div>
            
             <div class="postfooter">
-                <span class="likeArea" title="${likeTitle}">
-                    <span class="likeCmd ${likeDisabledClass}" postId="${post.Id}">
-                        <i class="${likeIconClass}"></i> <span class="likeCount">${post.LikesCount}</span>
-                    </span>
-                </span>
                 <span postId="${post.Id}" class="moreText cmdIconXSmall fa fa-angle-double-down" title="Afficher la suite"></span>
                 <span postId="${post.Id}" class="lessText cmdIconXSmall fa fa-angle-double-up" title="Raccourcir"></span>
             </div>         
