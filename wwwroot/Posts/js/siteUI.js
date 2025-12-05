@@ -20,6 +20,7 @@ Init_UI();
 async function Init_UI() {
     AuthManager.onTimeout = handleSessionTimeout;
     AuthManager.load();
+    AuthManager.clear();
 
     postsPanel = new PageManager('postsScrollPanel', 'postsPanel', 'postSample', renderPosts);
     $('#createPost').on("click", async function () {
@@ -110,7 +111,7 @@ function toggleShowKeywords() {
 /////////////////////////// Views management ////////////////////////////////////////////////////////////
 
 function refreshHeader() {
-    if (AuthManager.canCreatePost())
+    if (AuthManager.isLoggedIn())
         $("#createPost").show();
     else
         $("#createPost").hide();
@@ -556,7 +557,7 @@ function newPost() {
     return Post;
 }
 function renderPostForm(post = null) {
-    if (!AuthManager.canCreatePost() && (!post || !AuthManager.canManagePost(post))) {
+    if (!AuthManager.isLoggedIn()) {
         showLoginForm();
         return;
     }
