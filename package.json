@@ -1,7 +1,6 @@
 {
   "name": "atelier-1",
   "version": "1.0.0",
-  "description": "",
   "main": "http-server.js",
   "type": "module",
   "engines": {
@@ -22,5 +21,14 @@
     "start": "node http-server.js"
   },
   "author": "Votre nom",
-  "license": "ISC"
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rabli1/PFI_Node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Rabli1/PFI_Node/issues"
+  },
+  "homepage": "https://github.com/Rabli1/PFI_Node#readme",
+  "description": ""
 }
