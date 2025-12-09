@@ -110,7 +110,7 @@ function toggleShowKeywords() {
 /////////////////////////// Views management ////////////////////////////////////////////////////////////
 
 function refreshHeader() {
-    if (AuthManager.isLoggedIn())
+    if (AuthManager.canCreatePost())
         $("#createPost").show();
     else
         $("#createPost").hide();
@@ -119,12 +119,13 @@ function intialView() {
     refreshHeader();
     $('#menu').show();
     $('#commit').hide();
+    $("#commit").removeClass("fa-trash text-danger").addClass("fa-check").attr("title", "Procéder");
     $('#abort').hide();
     $('#form').hide();
     $('#form').empty();
     $('#aboutContainer').hide();
     $('#errorContainer').hide();
-    $("#createPost").show();
+    refreshHeader();
 
     showSearchIcon();
 }
@@ -154,17 +155,20 @@ function showError(message) {
 }
 function showCreatePostForm() {
     showForm("Ajout");
+    $("#commit").removeClass("fa-trash text-danger").addClass("fa-check").attr("title", "Procéder");
     $('#commit').show();
     renderPostForm();
 }
 function showEditPostForm(id) {
     showForm("Modification");
+    $("#commit").removeClass("fa-trash text-danger").addClass("fa-check").attr("title", "Procéder");
     $('#commit').show();
     renderEditPostForm(id);
 }
 function showDeletePostForm(id) {
     showForm("Retrait");
-    $('#commit').hide();
+    $("#commit").off();
+    $("#commit").show().removeClass("fa-check").addClass("fa-trash text-danger").attr("title", "Confirmer le retrait");
     renderDeletePostForm(id);
 }
 function showAbout() {
@@ -253,7 +257,8 @@ async function renderPosts(container, queryString) {
 }
 function renderPost(post) {
     let date = convertToFrenchDate(UTC_To_Local(post.Date));
-    const canEdit = AuthManager.canManagePost(post);
+    const canEdit = AuthManager.canEditPost(post);
+    const canDelete = AuthManager.canDeletePost(post);
     const userLiked = AuthManager.isLoggedIn() && post.Likes && AuthManager.user && post.Likes.includes(AuthManager.user.Id);
     const likeIconClass = userLiked ? "fa-solid fa-thumbs-up liked" : "fa-regular fa-thumbs-up";
     const likeTitle = post.LikedBy && post.LikedBy.length > 0 ? post.LikedBy.join(', ') : "Aucun like";
@@ -267,7 +272,7 @@ function renderPost(post) {
                 </div>
                 <div class="postActions">
                     ${canEdit ? `<span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>` : ""}
-                    ${canEdit ? `<span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>` : ""}
+                    ${canDelete ? `<span class="deleteCmd cmdIconSmall fa fa-trash" postId="${post.Id}" title="Effacer nouvelle"></span>` : ""}
                     <span class="likeArea" title="${likeTitle}">
                         <span class="likeCmd ${likeDisabledClass}" postId="${post.Id}">
                             <i class="${likeIconClass}"></i> <span class="likeCount">${post.LikesCount}</span>
@@ -419,7 +424,7 @@ function attach_Posts_UI_Events_Callback() {
 }
 async function toggleLike(postId) {
     if (!AuthManager.canLike()) {
-        showLoginForm();
+        popupMessage("Vous devez être connecté avec le rôle d'usager ou super usager pour aimer.");
         return;
     }
     timeout();
@@ -517,17 +522,25 @@ async function renderDeletePostForm(id) {
             let date = convertToFrenchDate(UTC_To_Local(post.Date));
             $("#form").append(`
                 <div class="post" id="${post.Id}">
-                <div class="postHeader">  ${post.Category} </div>
-                <div class="postTitle ellipsis"> ${post.Title} </div>
-                <img class="postImage" src='${post.Image}'/>
-                <div class="postDate"> ${date} </div>
-                <div class="postTextContainer showExtra">
-                    <div class="postText">${post.Text}</div>
+                    <div class="postHeader">  ${post.Category} </div>
+                    <div class="postTitle ellipsis"> ${post.Title} </div>
+                    <img class="postImage" src='${post.Image}'/>
+                    <div class="postDate"> ${date} </div>
+                    <div class="postTextContainer showExtra">
+                        <div class="postText">${post.Text}</div>
+                    </div>
+                    <div class="mt-3 alert alert-warning text-center">
+                        Confirmer la suppression de cette nouvelle ?
+                    </div>
+                    <div class="d-grid gap-2 mt-2">
+                        <button class="btn btn-danger" id="confirmDelete">Supprimer</button>
+                        <button class="btn btn-secondary" id="cancelDelete">Annuler</button>
+                    </div>
                 </div>
             `);
             linefeeds_to_Html_br(".postText");
             // attach form buttons click event callback
-            $('#commit').on("click", async function () {
+            $('#confirmDelete').on("click", async function () {
                 await Posts_API.Delete(post.Id);
                 if (!Posts_API.error) {
                     await showPosts(true);
@@ -536,8 +549,11 @@ async function renderDeletePostForm(id) {
                     showError(Posts_API.currentHttpError);
                 }
             });
-            $('#cancel').on("click", async function () {
+            $('#cancelDelete').on("click", async function () {
                 await showPosts();
+            });
+            $("#commit").off().on("click", function () {
+                $('#confirmDelete').trigger("click");
             });
 
         } else {
@@ -628,6 +644,8 @@ function renderPostForm(post = null) {
     $('#postForm').on("submit", async function (event) {
         event.preventDefault();
         let post = getFormData($("#postForm"));
+        post.Title = post.Title ? post.Title.trim() : post.Title;
+        post.Category = post.Category ? post.Category.trim() : post.Category;
         if (post.Category != selectedCategory)
             selectedCategory = "";
         if (create || !('keepDate' in post))

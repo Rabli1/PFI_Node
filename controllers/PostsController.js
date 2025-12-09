@@ -12,7 +12,9 @@ export default class PostsController extends Controller {
     post(data) {
         if (!this.HttpContext.user)
             return this.HttpContext.response.unAuthorized("Connexion requise.");
-        if (!AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.superUser()))
+        const isAdmin = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.admin());
+        const isSuper = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.superUser());
+        if (!isAdmin && !isSuper)
             return this.HttpContext.response.forbidden("Droits insuffisants pour creer une nouvelle.");
         data.UserId = this.HttpContext.user.Id;
         data.Likes = [];
@@ -27,7 +29,9 @@ export default class PostsController extends Controller {
             return this.HttpContext.response.notFound("Resource not found.");
         const isOwner = storedPost.UserId === this.HttpContext.user.Id;
         const isAdmin = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.admin());
-        if (!isOwner && !isAdmin)
+        const isSuperUser = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.superUser());
+        // Admin peut modifier, super usager seulement ses propres posts
+        if (!(isAdmin || (isSuperUser && isOwner)))
             return this.HttpContext.response.forbidden("Droits insuffisants pour modifier cette nouvelle.");
 
         data.UserId = storedPost.UserId;
@@ -50,6 +54,8 @@ export default class PostsController extends Controller {
     }
 
     like(data) {
+        if (AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.admin()))
+            return this.HttpContext.response.forbidden("Les administrateurs ne peuvent pas aimer une nouvelle.");
         if (!AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.user()))
             return this.HttpContext.response.unAuthorized("Connexion requise pour aimer une nouvelle.");
         if (!data || !data.postId)

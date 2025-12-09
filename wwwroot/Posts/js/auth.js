@@ -42,10 +42,11 @@ const AuthManager = {
     },
     isLoggedIn() { return this.user !== null },
     isAdmin() { return this.user && this.user.Authorizations && this.user.Authorizations.readAccess >= 3 && this.user.Authorizations.writeAccess >= 3; },
-    isSuper() { return this.user && this.user.Authorizations && this.user.Authorizations.readAccess >= 2 && this.user.Authorizations.writeAccess >= 2; },
+    isSuper() { return this.user && !this.isAdmin() && this.user.Authorizations.readAccess >= 2 && this.user.Authorizations.writeAccess >= 2; },
     canCreatePost() { return this.isSuper() || this.isAdmin(); },
-    canManagePost(post) { return this.isAdmin() || (this.isSuper() && post && post.OwnerId === this.user.Id); },
-    canLike() { return this.user && this.user.Authorizations && this.user.Authorizations.readAccess > 0; },
+    canEditPost(post) { return (this.isSuper() && post && post.OwnerId === this.user.Id) || this.isAdmin(); },
+    canDeletePost(post) { return (this.isSuper() && post && post.OwnerId === this.user.Id) || this.isAdmin(); },
+    canLike() { return this.user && !this.isAdmin() && this.user.Authorizations && this.user.Authorizations.readAccess > 0; },
     roleLabel() {
         if (this.isAdmin()) return "Administrateur";
         if (this.isSuper()) return "Super usager";

@@ -14,6 +14,7 @@ export default class Post extends Model {
         this.addField('UserId', 'string');
         this.addField('Likes', 'array');
 
+        // Title must be unique
         this.setKey("Title");
     }
 
