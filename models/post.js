@@ -20,8 +20,6 @@ export default class Post extends Model {
 
     bindExtraData(post) {
         const usersRepository = new Repository(new User());
-        post.Likes = post.Likes ? post.Likes : [];
-        post.UserId = post.UserId ? post.UserId : "";
 
         const owner = post.UserId ? usersRepository.get(post.UserId) : null;
         post.OwnerId = post.UserId;
