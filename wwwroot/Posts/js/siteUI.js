@@ -316,9 +316,10 @@ function updateDropDownMenu() {
     DDMenu.empty();
 
     if (AuthManager.isLoggedIn()) {
+        let avatarSrc = (AuthManager.user && AuthManager.user.Avatar) ? AuthManager.user.Avatar : 'no-avatar.png';
         DDMenu.append(`
-            <div class="dropdown-item menuItemLayout disabled">
-                <i class="menuIcon fa fa-user mx-2"></i> ${AuthManager.user.Name} (${AuthManager.roleLabel()})
+            <div class="dropdown-item menuItemLayout disabled d-flex align-items-center">
+                <div class="UserAvatarXSmall" id="userAvatarToggle" style="background-image:url('${avatarSrc}')"></div class="mx-4"> ${AuthManager.user.Name} (${AuthManager.roleLabel()})
             </div>`);
         DDMenu.append($(`<div class="dropdown-divider"></div>`));
         DDMenu.append(`
@@ -424,7 +425,7 @@ function attach_Posts_UI_Events_Callback() {
 }
 async function toggleLike(postId) {
     if (!AuthManager.canLike()) {
-        popupMessage("Vous devez être connecté avec le rôle d'usager ou super usager pour aimer.");
+        popupMessage("Vous devez être connecté pour aimer un post.");
         return;
     }
     timeout();

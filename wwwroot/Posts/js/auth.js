@@ -1,4 +1,4 @@
-const sessionDurationSeconds = 20 * 60;
+const sessionDurationSeconds = 1 * 60;
 
 const AuthManager = {
     user: null,

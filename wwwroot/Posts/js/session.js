@@ -1,9 +1,10 @@
 function createTimeoutPopup(message = "") {
+    if ($(".popup").length) return;
     $('body').append(`
         <div class='popup'> 
             <div class='popupContent'>
                 <div>
-                    <div class='popupHearder'> Attention!</div> 
+                    <div class='popupHeader'> Attention!</div> 
                     <h4 id='popUpMessage'>${message}</h4>
                 </div>
                 <div onclick='closePopup(); ' class='close-btn fa fa-close'></div> 
@@ -21,7 +22,6 @@ let timeLeft = infinite;
 let maxStallingTime = infinite;
 
 function popupMessage(message) {
-    createTimeoutPopup(message);
     $(".popup").show();
 }
 
@@ -35,7 +35,7 @@ function noTimeout() {
     $(".popup").hide();
     clearTimeout(currentTimeouID);
 }
-function setidleTime(idleTime = 20 * 60) {
+function setidleTime(idleTime = 1 * 60) {
     maxStallingTime = idleTime;
     timeout();
 }
@@ -57,12 +57,10 @@ function startCountdown() {
                     $("#popUpMessage").text("Expiration dans " + timeLeft + " secondes");
                 }
             } else {
-                $("#popUpMessage").text('Redirection dans ' + (timeBeforeRedirect + timeLeft) + " secondes");
-                if (timeLeft <= -timeBeforeRedirect) {
-                    clearTimeout(currentTimeouID);
-                    closePopup();
-                    timeoutCallBack();
-                }
+                closePopup();
+                $("#popUpMessage").text('Redirection');
+                clearTimeout(currentTimeouID);
+                timeoutCallBack();
             }
         }, 1000);
     }
