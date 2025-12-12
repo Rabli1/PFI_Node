@@ -2,8 +2,6 @@ import PostModel from '../models/post.js';
 import Repository from '../models/repository.js';
 import Controller from './Controller.js';
 import AccessControl from '../accessControl.js';
-import path from 'path';
-
 export default class PostsController extends Controller {
     constructor(HttpContext) {
         super(HttpContext, new Repository(new PostModel()));
@@ -13,8 +11,12 @@ export default class PostsController extends Controller {
         if (!this.HttpContext.user)
             return this.HttpContext.response.unAuthorized("Connexion requise.");
         const isAdmin = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.admin());
-        const isSuper = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.superUser());
-        if (!isAdmin && !isSuper)
+        const isSuperOnly = this.HttpContext.authorizations &&
+            this.HttpContext.authorizations.readAccess === 2 &&
+            this.HttpContext.authorizations.writeAccess === 2;
+        if (isAdmin)
+            return this.HttpContext.response.forbidden("Les administrateurs ne peuvent pas creer de nouvelles.");
+        if (!isSuperOnly)
             return this.HttpContext.response.forbidden("Droits insuffisants pour creer une nouvelle.");
         data.UserId = this.HttpContext.user.Id;
         data.Likes = [];
@@ -24,14 +26,15 @@ export default class PostsController extends Controller {
     put(data) {
         if (!this.HttpContext.user)
             return this.HttpContext.response.unAuthorized("Connexion requise.");
+        const isAdmin = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.admin());
+        if (isAdmin)
+            return this.HttpContext.response.forbidden("Les administrateurs ne peuvent pas modifier les nouvelles.");
         const storedPost = this.repository.get(this.HttpContext.path.id, true);
         if (!storedPost)
             return this.HttpContext.response.notFound("Resource not found.");
         const isOwner = storedPost.UserId === this.HttpContext.user.Id;
-        const isAdmin = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.admin());
         const isSuperUser = AccessControl.writeGranted(this.HttpContext.authorizations, AccessControl.superUser());
-        // Admin peut modifier, super usager seulement ses propres posts
-        if (!(isAdmin || (isSuperUser && isOwner)))
+        if (!(isSuperUser && isOwner))
             return this.HttpContext.response.forbidden("Droits insuffisants pour modifier cette nouvelle.");
 
         data.UserId = storedPost.UserId;

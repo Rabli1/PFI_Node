@@ -268,7 +268,7 @@ function renderPost(post) {
         `<div class="post" id="${post.Id}" etag="${currentETag}">
             <div class="postHeader">
                 <div>
-                    ${post.Category} • <span class="postOwner">${post.OwnerName}</span>
+                    ${post.Category} - <span class="postOwner">${post.OwnerName}</span>
                 </div>
                 <div class="postActions">
                     ${canEdit ? `<span class="editCmd cmdIconSmall fa fa-pencil" postId="${post.Id}" title="Modifier nouvelle"></span>` : ""}

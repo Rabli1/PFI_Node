@@ -43,8 +43,8 @@ const AuthManager = {
     isLoggedIn() { return this.user !== null },
     isAdmin() { return this.user && this.user.Authorizations && this.user.Authorizations.readAccess >= 3 && this.user.Authorizations.writeAccess >= 3; },
     isSuper() { return this.user && !this.isAdmin() && this.user.Authorizations.readAccess >= 2 && this.user.Authorizations.writeAccess >= 2; },
-    canCreatePost() { return this.isSuper() || this.isAdmin(); },
-    canEditPost(post) { return (this.isSuper() && post && post.OwnerId === this.user.Id) || this.isAdmin(); },
+    canCreatePost() { return this.isSuper(); },
+    canEditPost(post) { return this.isSuper() && post && post.OwnerId === this.user.Id; },
     canDeletePost(post) { return (this.isSuper() && post && post.OwnerId === this.user.Id) || this.isAdmin(); },
     canLike() { return this.user && !this.isAdmin() && this.user.Authorizations && this.user.Authorizations.readAccess > 0; },
     roleLabel() {
