@@ -188,7 +188,6 @@ export default class AccountsController extends Controller {
                     let updatedUser = this.repository.update(user.Id, user);
                     if (this.repository.model.state.isValid) {
                         this.HttpContext.response.accepted(updatedUser);
-                        // todo : renew etag of all user related repositories
                     }
                     else {
                         if (this.repository.model.state.inConflict)
